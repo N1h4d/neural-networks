@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neural Network Simulator: ANN, CNN, RNN, GAN</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#fbfdf9;--card:#fff;--ink:#16261c;--mut:#4a6354;--line:#e3efe6;--g:#16a34a;--gd:#15803d;--t:#e4f7ea;--a:#16a34a;--ad:#15803d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:90px;scroll-behavior:smooth;height:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:0 18px 70px}
+header{padding:54px 0 14px}
+.kick{font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--gd)}
+h1{font:400 clamp(40px,8vw,78px)/1.02 "DM Serif Display",Georgia,serif;margin:10px 0 6px;letter-spacing:-.01em}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 18px}
+.chips b{padding:6px 16px;border-radius:99px;font-size:14px;background:var(--c);color:var(--ink)}
+header p{margin:0;color:var(--mut);max-width:660px;font-size:17px}
+.bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:5;margin:18px 0 4px;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:99px;box-shadow:0 8px 26px rgba(22,163,74,.13);padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.bar a{color:var(--mut);text-decoration:none;font-weight:700;font-size:14px;padding:5px 12px;border-radius:99px}
+.bar a:hover{background:#e4f7ea;color:var(--gd)}
+.sp{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);margin-left:auto}
+.btn{padding:8px 18px;border-radius:99px;border:1.5px solid var(--gd);background:var(--gd);color:#fff;font:700 14px "DM Sans",system-ui,sans-serif;cursor:pointer;transition:transform .12s}
+.btn:hover{transform:translateY(-1px)}
+.btn.gh{background:#fff;color:var(--gd)}
+#ann{--t:#e4f7ea;--a:#4ade80;--ad:#15803d}
+#cnn{--t:#fff5cf;--a:#fbbf24;--ad:#b45309}
+#rnn{--t:#e1f0ff;--a:#60a5fa;--ad:#1d4ed8}
+#gan{--t:#ffe9df;--a:#fb923c;--ad:#c2410c}
+#prompt{--t:#efe9ff;--a:#a78bfa;--ad:#6d28d9}
+.model{margin-top:30px;background:var(--t);border-radius:30px;padding:30px 28px}
+.model h2{margin:0 0 6px;font:400 clamp(26px,4vw,36px)/1.15 "DM Serif Display",Georgia,serif}
+.model h2 span{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--a);color:var(--ink);font:700 18px "DM Sans",sans-serif;margin-right:12px;vertical-align:middle}
+.sub{color:var(--mut);margin:0 0 18px;max-width:720px}
+.grid{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;background:#fff;border-radius:22px;padding:20px;box-shadow:0 10px 30px rgba(20,40,25,.07)}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.model{padding:22px 14px}}
+.vis{display:flex;flex-direction:column;gap:10px}
+canvas{border-radius:14px;border:1px solid var(--line);max-width:100%;background:#fff}
+.ctl{display:flex;flex-direction:column;gap:9px;min-width:0}
+.row{display:flex;align-items:center;gap:10px;font-size:14px}
+.row label{width:100px;color:var(--mut);flex:none}
+.row input[type=range]{flex:1;accent-color:var(--ad);min-width:0}
+.row output{width:40px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+pre{margin:0;background:color-mix(in srgb,var(--t) 45%,#fff);border-radius:12px;padding:12px 14px;font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre-wrap;word-break:break-word;color:var(--ink)}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;margin-top:22px}
+.info div{border-top:3px solid var(--a);padding-top:10px;font-size:14.5px}
+.info h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--ad)}
+.info p{margin:0 0 8px;color:#34493c}
+.info pre{background:#fff}
+.pb{height:20px;border-radius:99px;background:var(--a);color:var(--ink);font:700 12px/20px "DM Sans",system-ui;padding-left:8px;white-space:nowrap;min-width:2px;transition:width .15s}
+.br{display:grid;grid-template-columns:90px 1fr;gap:8px;align-items:center;margin:4px 0;font-size:13px}
+.rrow{display:flex;gap:10px;align-items:center;font:12.5px ui-monospace,Menlo,monospace;margin:2px 0}
+.hs{display:inline-flex;gap:2px}.hs i{width:13px;height:13px;border-radius:4px;border:1px solid var(--line);display:inline-block}
+select{padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);font:14px "DM Sans",system-ui}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px;font-size:14.5px}
+.steps div{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 6px 18px rgba(20,40,25,.06)}
+footer{margin-top:40px;color:var(--mut);font-size:13px;text-align:center}
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}
+.tab{flex:1 1 150px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:12px 16px;cursor:pointer;font:inherit;color:var(--ink);box-shadow:0 4px 14px rgba(20,40,25,.05);transition:transform .12s}
+.tab:hover{transform:translateY(-2px)}
+.tab b{display:block;font-size:18px}.tab small{color:var(--mut);font-size:13px}
+.tab.on{background:var(--c);border-color:var(--gd);box-shadow:0 0 0 3px rgba(22,163,74,.2)}
+.model{display:none}.model.on{display:block}
+.annw{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:860px){.annw{grid-template-columns:1fr}}
+.pan{background:#fff;border-radius:22px;padding:18px;box-shadow:0 10px 30px rgba(20,40,25,.07);min-width:0}
+.pan h3.t{margin:0 0 8px;font:400 26px/1.15 "DM Serif Display",Georgia,serif}
+.pan h4{color:var(--gd);margin:14px 0 4px;font-size:17px}
+.cl{display:inline-block;background:#eaf5ed;border-radius:8px;padding:4px 9px;margin:3px 0;font:12.5px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 22px;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.sl>div{display:flex;justify-content:space-between;font-size:14px;color:var(--mut)}
+.sl output{color:var(--ink);font-weight:700}
+.sl input{width:100%;accent-color:var(--gd)}
+.sp{flex-wrap:wrap}
+@media(max-width:600px){.sp{margin-left:0}.bar{border-radius:22px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="kick">Artificial Intelligence · course project</div>
+<h1>Neural Network Simulator</h1>
+<div class="chips"><b style="--c:#bbf7d0">ANN</b><b style="--c:#fde68a">CNN</b><b style="--c:#bfdbfe">RNN</b><b style="--c:#fed7aa">GAN</b></div>
+<p>Four real, running models. Change the sliders, click the pixels, press Train, and watch the numbers and the math update live. Below each model you will find the formulas, what is used, and what is found and how.</p>
+</header>
+<div class="tabs">
+<button class="tab" data-t="ann" style="--c:#e4f7ea"><b>ANN</b><small>Artificial Neural Network</small></button>
+<button class="tab" data-t="cnn" style="--c:#fff5cf"><b>CNN</b><small>Convolutional Neural Network</small></button>
+<button class="tab" data-t="rnn" style="--c:#e1f0ff"><b>RNN</b><small>Recurrent Neural Network</small></button>
+<button class="tab" data-t="gan" style="--c:#ffe9df"><b>GAN</b><small>Generative Adversarial Network</small></button>
+<button class="tab" data-t="prompt" style="--c:#efe9ff"><b>Prompts</b><small>How a prompt works</small></button>
+</div>
+<div class="bar">
+<div class="sp"><button class="btn gh" id="pause">Pause</button><button class="btn gh" id="rall">Restart animation</button><span>Speed</span><input type="range" id="spd" min=".25" max="4" step=".25" value="1" style="width:90px;accent-color:var(--g)"><span id="spdo">1×</span></div>
+</div>
+
+<section class="model" id="ann">
+<h2><span>1</span>ANN: learns to hit its targets</h2>
+<p class="sub">Set the three inputs and two targets, press Train, and watch every weight, activation and the loss change. This is backpropagation on a 3-4-4-2 network.</p>
+<div class="annw">
+<div class="pan">
+<svg id="asvg" viewBox="0 0 760 430" width="100%" font-family="DM Sans, system-ui, sans-serif" role="img" aria-label="Network diagram"></svg>
+<div class="btns" style="margin:10px 0 4px"><button class="btn" id="at">Train</button><button class="btn gh" id="astep">Train 1 step</button><button class="btn gh" id="ar">Reset weights</button><span id="astat" style="align-self:center;color:var(--mut);font-size:14px"></span></div>
+<div class="sg"><div class="sl"><div><span>Input x₁</span><output id="ax1o"></output></div><input type="range" id="ax1" min="0" max="1" step="0.05" value="0.8"></div><div class="sl"><div><span>Input x₂</span><output id="ax2o"></output></div><input type="range" id="ax2" min="0" max="1" step="0.05" value="0.2"></div><div class="sl"><div><span>Input x₃</span><output id="ax3o"></output></div><input type="range" id="ax3" min="0" max="1" step="0.05" value="0.6"></div><div class="sl"><div><span>Target y₁</span><output id="ay1o"></output></div><input type="range" id="ay1" min="0" max="1" step="1" value="1"></div><div class="sl"><div><span>Target y₂</span><output id="ay2o"></output></div><input type="range" id="ay2" min="0" max="1" step="1" value="0"></div><div class="sl"><div><span>Learning rate η</span><output id="alro"></output></div><input type="range" id="alr" min="0.05" max="2" step="0.05" value="0.5"></div></div>
+</div>
+<div class="pan live"><h3 class="t">ANN: Artificial Neural Network</h3>
+<p style="margin:0 0 6px;color:#34493c">Layers of fully connected neurons. Choose inputs and targets, then train: the network runs forward, computes the loss, backpropagates the error and updates all 36 weights and 10 biases.</p>
+<span class="cl">a = f(W·x + b)  |  W ← W − η·∂L/∂W</span>
+<div id="alive"></div></div>
+</div>
+<div class="info">
+<div><h3>Math</h3><pre>a¹ = tanh(W¹x + b¹)
+a² = tanh(W²a¹ + b²)
+ŷ  = σ(W³a² + b³)
+L  = ½ Σ (ŷ − y)²
+δ³ = (ŷ − y)·ŷ(1−ŷ)
+δˡ = (Wˡ⁺¹ᵀ δˡ⁺¹) ⊙ (1 − aˡ²)
+∂L/∂Wˡ = δˡ·(aˡ⁻¹)ᵀ</pre></div>
+<div><h3>What is used</h3><p>3 inputs, two hidden layers of 4 tanh neurons, 2 sigmoid outputs, backpropagation with gradient descent.</p><p>Real use: predicting prices, customer churn and credit risk from table data.</p></div>
+<div><h3>What is found and how</h3><p>The weights that make the outputs match the targets. Each step moves every weight a little against its gradient, so L falls. Raise η to learn faster, but too high makes it jump around.</p></div>
+</div></section>
+
+<section class="model" id="cnn">
+<h2><span>2</span>CNN: recognizes lines you draw</h2>
+<p class="sub">Click or drag on the 8×8 grid. Four 3×3 filters scan it, then a small trained layer decides: vertical, horizontal or diagonal. Press Train first.</p>
+<div class="grid">
+<div class="vis"><canvas id="cc" width="192" height="192" style="touch-action:none;cursor:crosshair"></canvas>
+<div class="btns"><button class="btn gh" data-ex="0">Vertical example</button><button class="btn gh" data-ex="1">Horizontal</button><button class="btn gh" data-ex="2">Diagonal</button><button class="btn gh" id="cclr">Clear</button></div></div>
+<div class="ctl">
+<canvas id="cf" width="450" height="130"></canvas>
+<div id="cbars"></div>
+<div class="row"><label>Learning rate</label><input type="range" id="clr" min=".05" max="2" step=".05" value=".5"><output id="clro"></output></div>
+<div class="btns"><button class="btn" id="ct">Train</button><button class="btn gh" id="cr">Reset weights</button></div>
+<pre id="cnum"></pre>
+</div></div>
+<div class="info">
+<div><h3>Math</h3><pre>f(i,j) = ReLU(Σ I[i+u, j+v]·K[u,v])
+pool = max over each 2×2 block
+z_k = Σ w_kq·f_q + b_k
+p = softmax(z)    L = −log p_true</pre></div>
+<div><h3>What is used</h3><p>4 fixed line filters, ReLU, 2×2 max-pooling and a trainable softmax layer (108 weights) trained on 240 generated noisy line images.</p><p>Real use: the same convolution and pooling idea inside YOLO (car speed), U-Net (park zones, satellite maps) and FaceNet (Face ID).</p></div>
+<div><h3>What is found and how</h3><p>Training learns which filter responses mean which class: a vertical line lights the vertical filter, so its weights grow. Accuracy is measured on 90 unseen images; your own drawings are the real test. In big CNNs the filters are learned too, here they are fixed to keep the mechanism visible.</p></div>
+</div></section>
+
+<section class="model" id="rnn">
+<h2><span>3</span>RNN: learns a letter pattern</h2>
+<p class="sub">Each row is one time step. Squares are the hidden state (the memory): amber positive, blue negative. The arrow is the letter the network predicts next.</p>
+<div class="grid">
+<div class="vis" style="min-width:320px"><div id="rrows"></div></div>
+<div class="ctl">
+<div class="row"><label>Pattern</label><select id="rpat"><option value="hello ">hello␣ (repeat)</option><option value="abc ">abc␣ (repeat)</option><option value="aabb">aabb (repeat)</option></select></div>
+<div class="row"><label>Learning rate</label><input type="range" id="rlr" min=".02" max=".3" step=".01" value=".1"><output id="rlro"></output></div>
+<div class="btns"><button class="btn" id="rt">Train</button><button class="btn gh" id="rr">Reset weights</button></div>
+<pre id="rnum"></pre>
+</div></div>
+<div class="info">
+<div><h3>Math</h3><pre>h(t) = tanh(Wxh·x(t) + Whh·h(t−1) + bh)
+p(t) = softmax(Why·h(t) + by)
+Backpropagation through time,
+Adagrad, gradients clipped to ±5</pre></div>
+<div><h3>What is used</h3><p>A letter vocabulary, 10 hidden units, the same weights reused at every step.</p><p>Real use: LSTM/GRU versions forecast F1 lap times and tyre wear, and power speech recognition and older translation systems.</p></div>
+<div><h3>What is found and how</h3><p>In “hello” the letter “l” must be followed by “l” the first time and “o” the second time. The input is identical, so only the hidden state can tell them apart. Watch the squares differ on those two rows and the confidence rise.</p></div>
+</div></section>
+
+<section class="model" id="gan">
+<h2><span>4</span>GAN: forger vs. detective</h2>
+<p class="sub">Green curve: real data. Amber bars: the generator’s fakes. Dark line: how real the discriminator thinks each value is (0 to 1).</p>
+<div class="grid">
+<div class="vis"><canvas id="gc" width="420" height="190"></canvas></div>
+<div class="ctl">
+<div class="row"><label>Real mean μ</label><input type="range" id="gmu" min="1" max="9" step=".5" value="4"><output id="gmuo"></output></div>
+<div class="row"><label>Generator lr</label><input type="range" id="glr" min=".005" max=".08" step=".005" value=".02"><output id="glro"></output></div>
+<div class="btns"><button class="btn" id="gt">Train</button><button class="btn gh" id="gr">Reset</button></div>
+<pre id="gnum"></pre>
+</div></div>
+<div class="info">
+<div><h3>Math</h3><pre>G(z) = a·z + b,  z ~ N(0,1)
+D(x) = σ(w₁u + w₂u² + c),  u = x/5
+D maximizes log D(real) + log(1 − D(G(z)))
+G maximizes log D(G(z))</pre></div>
+<div><h3>What is used</h3><p>Two models trained against each other: a 2-parameter generator and a 3-parameter discriminator (trained 5 times per generator step to stay stable). Real data are drawn from N(μ, 1.25²).</p><p>Real use: synthetic faces, image super-resolution, extra training data.</p></div>
+<div><h3>What is found and how</h3><p>The generator never sees real numbers, only the discriminator’s feedback, yet its mean b and spread |a| move toward μ and 1.25. The dark line flattens toward 0.5 when fakes become indistinguishable. Move μ while training and the forger follows.</p></div>
+</div></section>
+
+<section class="model" id="prompt">
+<h2><span>5</span>What happens when you send a prompt</h2>
+<p class="sub">A chat model is a very large Transformer (a descendant of the sequence idea behind RNNs). Nothing is learned from your message at that moment: the finished network only runs forward.</p>
+<div class="steps">
+<div><b>1 · Tokenize</b><br>Text is cut into tokens and turned into integer IDs.</div>
+<div><b>2 · Embed</b><br>Each ID becomes a vector; position information is added.</div>
+<div><b>3 · Self-attention</b><br>Every token weighs every other token, layer after layer.</div>
+<div><b>4 · Predict</b><br>Softmax gives a probability for every possible next token.</div>
+<div><b>5 · Sample</b><br>One token is chosen (temperature controls randomness).</div>
+<div><b>6 · Repeat</b><br>The token is appended and steps 3–5 repeat until the reply ends.</div>
+</div></section>
+<footer>Study project for an Artificial Intelligence course. All four models above are small versions trained live in your browser.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let paused=false,speed=1;const models=[];
+function reg(m,tb,rb){m.btn=$(tb);m.btn.onclick=()=>{m.run=!m.run;m.btn.textContent=m.run?'Stop':'Train'};$(rb).onclick=()=>{m.run=false;m.btn.textContent='Train';m.reset();m.draw()};models.push(m);m.draw()}
+function sl(id,fn){const r=$(id),o=$(id+'o'),u=()=>{o.textContent=(+r.value).toString()};r.addEventListener('input',()=>{u();fn&&fn()});u()}
+$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'Resume':'Pause'};
+$('rall').onclick=()=>models.forEach(m=>{m.run=false;m.btn.textContent='Train';m.reset();m.draw()});
+$('spd').oninput=()=>{speed=+$('spd').value;$('spdo').textContent=speed+'×'};
+(function frame(){if(!paused)models.forEach(m=>{if(!m.run)return;m.fr=(m.fr||0)+m.per*speed;const k=Math.floor(m.fr);m.fr-=k;for(let i=0;i<k;i++)m.step();m.draw();if(m.done()){m.run=false;m.btn.textContent='Train'}});requestAnimationFrame(frame)})();
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>models.forEach(m=>m.draw()));
+
+// ---------- ANN ----------
+(function(){const L=[3,4,4,2],R=()=>(Math.random()-.5)*1.6,mat=(r,c)=>Array.from({length:r},()=>Array.from({length:c},R)),sig=z=>1/(1+Math.exp(-z));
+let W,B,ep=0,hist=[];
+const X=()=>['ax1','ax2','ax3'].map(i=>+$(i).value),Y=()=>['ay1','ay2'].map(i=>+$(i).value);
+function fwd(x){const A=[x],Z=[];for(let l=0;l<3;l++){const z=W[l].map((w,j)=>w.reduce((s,v,k)=>s+v*A[l][k],B[l][j]));Z.push(z);A.push(z.map(l<2?Math.tanh:sig))}return[A,Z]}
+function grads(x,y){const[A,Z]=fwd(x),o=A[3],d3=o.map((v,j)=>(v-y[j])*v*(1-v)),
+d2=A[2].map((a,j)=>(1-a*a)*W[2].reduce((s,w,k)=>s+w[j]*d3[k],0)),d1=A[1].map((a,j)=>(1-a*a)*W[1].reduce((s,w,k)=>s+w[j]*d2[k],0));return{A,Z,d:[d1,d2,d3]}}
+const lossOf=(o,y)=>.5*o.reduce((s,v,j)=>s+(v-y[j])**2,0);
+const m={per:6,run:false,done:()=>ep>=10000,
+reset(){W=[mat(4,3),mat(4,4),mat(2,4)];B=[[0,0,0,0].map(R),[0,0,0,0].map(R),[0,0].map(R)];ep=0;hist=[lossOf(fwd(X())[0][3],Y())]},
+step(){const x=X(),y=Y(),eta=+$('alr').value,g=grads(x,y);
+for(let l=0;l<3;l++)for(let j=0;j<L[l+1];j++){for(let k=0;k<L[l];k++)W[l][j][k]-=eta*g.d[l][j]*g.A[l][k];B[l][j]-=eta*g.d[l][j]}
+ep++;if(ep%3==0){hist.push(lossOf(fwd(x)[0][3],y));if(hist.length>240)hist.shift()}},
+draw(){const x=X(),y=Y(),eta=+$('alr').value,g=grads(x,y),A=g.A,o=A[3],Lv=lossOf(o,y),cx=[90,270,470,650],py=(l,j)=>215+(j-(L[l]-1)/2)*84,f=v=>v.toFixed(2);let s='';
+['Input x','Hidden 1','Hidden 2','Output ŷ'].forEach((t,l)=>s+=`<text x="${cx[l]}" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#16261c">${t}</text>`);
+s+=`<text x="380" y="52" text-anchor="middle" font-size="12" fill="#4a6354">teal edge = positive weight, rose = negative; thickness = |w|. Node text = activation a</text>`;
+for(let l=0;l<3;l++)for(let j=0;j<L[l+1];j++)for(let k=0;k<L[l];k++){const w=W[l][j][k];s+=`<line x1="${cx[l]}" y1="${py(l,k)}" x2="${cx[l+1]}" y2="${py(l+1,j)}" stroke="${w>0?'#0d9488':'#e11d48'}" stroke-width="${(.4+Math.min(Math.abs(w),2)*2).toFixed(2)}" opacity=".6"/>`}
+for(let l=0;l<4;l++)for(let j=0;j<L[l];j++){const a=A[l][j];s+=`<circle cx="${cx[l]}" cy="${py(l,j)}" r="24" fill="rgba(13,148,136,${(.18+.6*Math.min(Math.abs(a),1)).toFixed(2)})" stroke="#0d9488" stroke-width="2"/><text x="${cx[l]}" y="${py(l,j)+5}" text-anchor="middle" font-size="13" font-weight="700" fill="#10261c">${f(a)}</text>`}
+y.forEach((t,j)=>s+=`<text x="684" y="${py(3,j)+4}" font-size="12" fill="#4a6354">target ${t}</text>`);
+const hh=hist.length?hist:[Lv],mx=Math.max(...hh,1e-9),pts=hh.map((v,i)=>`${(28+(hh.length>1?i/(hh.length-1):0)*154).toFixed(1)},${(412-v/mx*58).toFixed(1)}`).join(' ');
+s+=`<rect x="20" y="335" width="170" height="90" rx="8" fill="#fff" stroke="#cfe0d4"/><text x="105" y="352" text-anchor="middle" font-size="11" font-weight="700" fill="#4a6354">Loss L over training steps</text><polyline points="${pts}" fill="none" stroke="#e11d48" stroke-width="2"/>`;
+s+=`<text x="470" y="392" font-size="22" font-weight="700" fill="#e11d48">L = ${Lv.toFixed(3)}</text><text x="470" y="412" font-size="11" fill="#4a6354">½[(ŷ₁−y₁)² + (ŷ₂−y₂)²]</text>`;
+$('asvg').innerHTML=s;$('astat').textContent='step '+ep;
+const w0=W[0][0],z=g.Z[0][0],gr=g.d[0][0]*x[0],c=t=>`<span class="cl">${t}</span>`;
+$('alive').innerHTML=`<h4>Neuron 1 of hidden layer 1</h4>${c(`z = Σ w·x + b = ${w0.map((w,k)=>f(w)+'×'+f(x[k])).join(' + ')} + ${f(B[0][0])} = ${f(z)}`)}<br>${c(`a = tanh(z) = ${f(A[1][0])}`)}<h4>Output &amp; loss</h4>${c(`ŷ = (${o[0].toFixed(3)}, ${o[1].toFixed(3)})`)} ${c(`L = ${Lv.toFixed(3)}`)}<h4>Gradient of one weight (w₁₁)</h4>${c(`∂L/∂w = δ·x = ${(Math.abs(gr)<5e-4?0:gr).toFixed(3)}`)}<br>${c(`w_new = w − η·∂L/∂w = ${(w0[0]-eta*gr).toFixed(3)}`)}<p style="margin:12px 0 0;color:#34493c">Press <b>Train 1 step</b> and watch L fall.</p>`}};
+m.reset();reg(m,'at','ar');['ax1','ax2','ax3','ay1','ay2','alr'].forEach(i=>sl(i,()=>m.draw()));$('astep').onclick=()=>{m.step();m.draw()}})();
+
+// ---------- CNN ----------
+(function(){const a=$('cc').getContext('2d'),b=$('cf').getContext('2d'),G=new Array(64).fill(0),CL=['Vertical','Horizontal','Diagonal'],
+KF=[['Vertical',[[-1,2,-1],[-1,2,-1],[-1,2,-1]]],['Horizontal',[[-1,-1,-1],[2,2,2],[-1,-1,-1]]],['Diag \\',[[2,-1,-1],[-1,2,-1],[-1,-1,2]]],['Diag /',[[-1,-1,2],[-1,2,-1],[2,-1,-1]]]];
+const conv=g=>KF.map(([n,k])=>{const m=[];for(let i=0;i<6;i++){m.push([]);for(let j=0;j<6;j++){let s=0;for(let u=0;u<3;u++)for(let v=0;v<3;v++)s+=g[(i+u)*8+j+v]*k[u][v];m[i].push(Math.max(0,s))}}return m});
+const pool=ms=>{const f=[];ms.forEach(m=>{for(let i=0;i<3;i++)for(let j=0;j<3;j++)f.push(Math.max(m[2*i][2*j],m[2*i][2*j+1],m[2*i+1][2*j],m[2*i+1][2*j+1])/6)});return f};
+const ri=n=>Math.floor(Math.random()*n);
+function gen(t,nz=.02){const g=new Array(64).fill(0);
+if(t<2){const c=1+ri(6),len=4+ri(3),r0=ri(7-len);for(let i=0;i<len;i++)g[t?c*8+r0+i:(r0+i)*8+c]=1}
+else{const len=5+ri(3),o=ri(9-len),o2=ri(9-len),fl=Math.random()<.5;for(let i=0;i<len;i++)g[(o+i)*8+(fl?7-(o2+i):o2+i)]=1}
+for(let k=0;k<64;k++)if(Math.random()<nz)g[k]^=1;return g}
+const mk=n=>Array.from({length:n},(_,i)=>{const t=i%3;return{f:pool(conv(gen(t))),t}}),tr=mk(240),te=mk(90);
+let W,bb,ep=0;
+const sm=f=>{const z=[0,1,2].map(k=>{let s=bb[k];for(let q=0;q<36;q++)s+=W[k*36+q]*f[q];return s}),mx=Math.max(...z),e=z.map(v=>Math.exp(v-mx)),t=e.reduce((x,y)=>x+y,0);return[z,e.map(v=>v/t)]};
+const m={per:6,run:false,done:()=>ep>=4000,
+reset(){W=Float64Array.from({length:108},()=>(Math.random()-.5)*.1);bb=[0,0,0];ep=0},
+step(){const lr=+$('clr').value/12,g=new Float64Array(108),gb=[0,0,0];for(let s=0;s<12;s++){const{f,t}=tr[ri(tr.length)],p=sm(f)[1];p[t]-=1;for(let k=0;k<3;k++){gb[k]+=p[k];for(let q=0;q<36;q++)g[k*36+q]+=p[k]*f[q]}}
+for(let i=0;i<108;i++)W[i]-=lr*g[i];for(let k=0;k<3;k++)bb[k]-=lr*gb[k];ep++},
+draw(){const ink=css('--ink');a.clearRect(0,0,192,192);for(let r=0;r<8;r++)for(let c=0;c<8;c++){a.fillStyle=G[r*8+c]?'#15803d':'#eef4ef';a.fillRect(c*24,r*24,23,23)}
+const ms=conv(G),f=pool(ms);b.clearRect(0,0,450,130);ms.forEach((mp,q)=>{mp.forEach((row,i)=>row.forEach((v,j)=>{b.fillStyle=`rgba(217,119,6,${.07+.93*Math.min(v/6,1)})`;b.fillRect(q*113+j*17,i*17,16,16)}));b.fillStyle=ink;b.font='11px system-ui';b.fillText(KF[q][0],q*113,124)});
+let L=0;tr.forEach(({f:x,t})=>{L-=Math.log(sm(x)[1][t]+1e-9)});let ok=0;te.forEach(({f:x,t})=>{const p=sm(x)[1];if(p.indexOf(Math.max(...p))==t)ok++});
+const[z,p]=sm(f);$('cbars').innerHTML=CL.map((n,k)=>`<div class="br"><span>${n}</span><div class="pb" style="width:${Math.max(p[k]*100,2)}%">${(p[k]*100).toFixed(0)}%</div></div>`).join('');
+$('cnum').textContent=`epoch ${ep}    train loss ${(L/tr.length).toFixed(3)}    test accuracy ${(ok/te.length*100).toFixed(0)}%\nz = Σ w·f + b = [${z.map(v=>v.toFixed(2)).join(', ')}]\np = softmax(z) = [${p.map(v=>v.toFixed(2)).join(', ')}]`}};
+m.reset();G.splice(0,64,...gen(0,0));reg(m,'ct','cr');sl('clr');
+let mode=1;const cv=$('cc'),cell=e=>{const r=cv.getBoundingClientRect(),c=Math.floor((e.clientX-r.left)/r.width*8),q=Math.floor((e.clientY-r.top)/r.height*8);if(c<0||c>7||q<0||q>7)return;G[q*8+c]=mode;m.draw()};
+cv.onpointerdown=e=>{const r=cv.getBoundingClientRect();mode=G[Math.floor((e.clientY-r.top)/r.height*8)*8+Math.floor((e.clientX-r.left)/r.width*8)]?0:1;cv.setPointerCapture(e.pointerId);cell(e)};
+cv.onpointermove=e=>{if(e.buttons)cell(e)};$('cclr').onclick=()=>{G.fill(0);m.draw()};
+document.querySelectorAll('[data-ex]').forEach(x=>x.onclick=()=>{G.splice(0,64,...gen(+x.dataset.ex,0));m.draw()})})();
+
+// ---------- RNN ----------
+(function(){const H=10,rnd=k=>Float64Array.from({length:k},()=>(Math.random()-.5)*.2);let txt,ch,V,xs,ts,n,P,M,ep=0,loss=0;
+const m={per:3,run:false,done:()=>ep>=1500,
+reset(){const pat=$('rpat').value;txt=pat.repeat(Math.ceil(26/pat.length));ch=[...new Set(txt)];V=ch.length;const ix=c=>ch.indexOf(c);xs=[...txt].slice(0,-1).map(ix);ts=[...txt].slice(1).map(ix);n=xs.length;
+P={Wxh:rnd(H*V),Whh:rnd(H*H),Why:rnd(V*H),bh:new Float64Array(H),by:new Float64Array(V)};M={};for(const k in P)M[k]=new Float64Array(P[k].length).fill(1e-8);ep=0;loss=0},
+step(){const lr=+$('rlr').value,hs=[new Float64Array(H)],ps=[];let L=0;
+for(let t=0;t<n;t++){const[h,p]=cell(xs[t],hs[t]);hs.push(h);ps.push(p);L-=Math.log(p[ts[t]])}
+const G={};for(const k in P)G[k]=new Float64Array(P[k].length);let dn=new Float64Array(H);
+for(let t=n-1;t>=0;t--){const dy=Float64Array.from(ps[t]);dy[ts[t]]-=1;const dh=Float64Array.from(dn),h=hs[t+1];
+for(let k=0;k<V;k++){G.by[k]+=dy[k];for(let i=0;i<H;i++){G.Why[k*H+i]+=dy[k]*h[i];dh[i]+=P.Why[k*H+i]*dy[k]}}
+dn=new Float64Array(H);
+for(let i=0;i<H;i++){const dr=dh[i]*(1-h[i]*h[i]);G.bh[i]+=dr;G.Wxh[i*V+xs[t]]+=dr;for(let j=0;j<H;j++){G.Whh[i*H+j]+=dr*hs[t][j];dn[j]+=P.Whh[i*H+j]*dr}}}
+for(const k in P)for(let q=0;q<P[k].length;q++){const g=Math.max(-5,Math.min(5,G[k][q]));M[k][q]+=g*g;P[k][q]-=lr*g/Math.sqrt(M[k][q])}ep++;loss=L/n},
+draw(){let h=new Float64Array(H),c=xs[0],o='',tot=0,hit=0;const q=z=>z===' '?'␣':z;
+for(let s=0;s<14;s++){const[h2,p]=cell(c,h);h=h2;let b=0;for(let k=1;k<V;k++)if(p[k]>p[b])b=k;const want=ts[s];if(b===want)hit++;tot++;
+o+=`<div class="rrow"><span style="width:46px">in “${q(ch[c])}”</span><span class="hs">${[...h].map(v=>`<i style="background:rgba(${v>0?'217,119,6':'59,91,219'},${Math.abs(v).toFixed(2)})"></i>`).join('')}</span><span>→ “${q(ch[b])}” ${(p[b]*100).toFixed(0)}%</span><span style="color:var(--mut)">${b===want?'✓':'✗ want “'+q(ch[want])+'”'}</span></div>`;c=ts[s]}
+$('rrows').innerHTML=o;$('rnum').textContent=`epoch ${ep}    loss ${loss.toFixed(3)}    correct next letter: ${hit}/${tot}\nh(t) = tanh(Wxh·x + Whh·h(t−1) + bh)\nvocabulary: ${ch.map(q).join(' ')}  (${V} letters, ${H} hidden units)`}};
+function cell(x,hp){const h=new Float64Array(H);for(let i=0;i<H;i++){let s=P.bh[i]+P.Wxh[i*V+x];for(let j=0;j<H;j++)s+=P.Whh[i*H+j]*hp[j];h[i]=Math.tanh(s)}
+const y=new Float64Array(V);let mx=-1e9;for(let k=0;k<V;k++){let s=P.by[k];for(let i=0;i<H;i++)s+=P.Why[k*H+i]*h[i];y[k]=s;if(s>mx)mx=s}
+let t=0;for(let k=0;k<V;k++){y[k]=Math.exp(y[k]-mx);t+=y[k]}for(let k=0;k<V;k++)y[k]/=t;return[h,y]}
+m.reset();reg(m,'rt','rr');sl('rlr');$('rpat').onchange=()=>{m.run=false;m.btn.textContent='Train';m.reset();m.draw()}})();
+
+// ---------- GAN ----------
+(function(){const c=$('gc').getContext('2d'),W=420,Hh=190,lo=-4,hi=12,rn=()=>{const u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(6.2832*v)},gz=Array.from({length:400},rn);
+let a,b,w,ep=0;const D=x=>{const u=x/5;return 1/(1+Math.exp(-(w[0]*u+w[1]*u*u+w[2])))},Y=v=>Hh-20-v/.5*(Hh-30);
+const m={per:10,run:false,done:()=>ep>=8000,
+reset(){a=.5;b=-1;w=[0,0,0];ep=0},
+step(){const n=64,mu=+$('gmu').value,glr=+$('glr').value;
+for(let kk=0;kk<5;kk++){const g=[0,0,0];for(let i=0;i<n;i++){const xr=mu+1.25*rn(),xf=a*rn()+b;for(const[x,t]of[[xr,1],[xf,0]]){const u=x/5,e=t-D(x);g[0]+=e*u;g[1]+=e*u*u;g[2]+=e}}for(let k=0;k<3;k++)w[k]+=.3*g[k]/n}
+let ga=0,gb=0;for(let i=0;i<n;i++){const z=rn(),xf=a*z+b,gx=(1-D(xf))*(w[0]/5+2*w[1]*xf/25);ga+=gx*z;gb+=gx}a+=glr*ga/n;b+=glr*gb/n;ep++},
+draw(){const ink=css('--ink'),mu=+$('gmu').value,bins=32,bw=(hi-lo)/bins,cnt=Array(bins).fill(0);c.clearRect(0,0,W,Hh);
+gz.forEach(z=>{const k=Math.floor((a*z+b-lo)/bw);if(k>=0&&k<bins)cnt[k]++});
+cnt.forEach((v,k)=>{const d=v/(gz.length*bw);c.fillStyle='rgba(217,119,6,.55)';c.fillRect(k*W/bins,Y(d),W/bins-1,Hh-20-Y(d))});
+c.beginPath();for(let px=0;px<=W;px++){const x=lo+px/W*(hi-lo),d=Math.exp(-((x-mu)**2)/3.125)/(1.25*2.5066);px?c.lineTo(px,Y(d)):c.moveTo(px,Y(d))}c.strokeStyle='#16a34a';c.lineWidth=2.5;c.stroke();
+c.beginPath();for(let px=0;px<=W;px++){const x=lo+px/W*(hi-lo),y=Hh-20-D(x)*(Hh-30);px?c.lineTo(px,y):c.moveTo(px,y)}c.strokeStyle=ink;c.lineWidth=1.8;c.stroke();
+c.fillStyle=ink;c.font='11px system-ui';for(let x=-4;x<=12;x+=2)c.fillText(x,(x-lo)/(hi-lo)*W-4,Hh-5);
+$('gnum').textContent=`step ${ep}\nG(z) = a·z + b:  a = ${a.toFixed(2)}, b = ${b.toFixed(2)}\ngenerator mean ${b.toFixed(2)}  (real ${mu.toFixed(2)})\ngenerator spread ${Math.abs(a).toFixed(2)}  (real 1.25)\nD(real mean) = ${D(mu).toFixed(2)}    D(fake mean) = ${D(b).toFixed(2)}`}};
+m.reset();reg(m,'gt','gr');sl('gmu',()=>m.draw());sl('glr')})();
+
+// ---------- tabs ----------
+(function(){const ids=['ann','cnn','rnn','gan','prompt'];
+function show(t){models.forEach(m=>{m.run=false;m.btn.textContent='Train'});document.querySelectorAll('.model').forEach(s=>s.classList.toggle('on',s.id===t));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));try{history.replaceState(null,'','#'+t)}catch(e){}models.forEach(m=>m.draw())}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>show(b.dataset.t));
+const hs=(typeof location!=='undefined'?location.hash:'').slice(1);show(ids.includes(hs)?hs:'ann')})();
+</script>
+</body>
+</html>
